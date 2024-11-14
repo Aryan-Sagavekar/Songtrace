@@ -4,9 +4,10 @@ import 'package:songtrace/helpers/STColors.dart';
 import 'package:songtrace/helpers/spotify_api.dart';
 import 'package:songtrace/model/playlist_model.dart';
 import 'package:songtrace/widgets/SongListCard.dart';
+import 'package:spotify/spotify.dart' as spotify;
 
 class SearchView extends StatefulWidget {
-  const SearchView({Key? key}) : super(key: key);
+  const SearchView({super.key});
 
   @override
   State<SearchView> createState() => _SearchViewState();
@@ -14,7 +15,7 @@ class SearchView extends StatefulWidget {
 
 class _SearchViewState extends State<SearchView> {
   final _textController = TextEditingController();
-  Future<List<PlaylistData>>? _searchResults;
+  Future<List<spotify.Track>>? _searchResults;
   bool _isLoading = false;
 
   void searchFunction() {
@@ -39,7 +40,7 @@ class _SearchViewState extends State<SearchView> {
             colors: [STColors.darkBlue, Colors.black],
           ),
         ),
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,8 +51,8 @@ class _SearchViewState extends State<SearchView> {
                 cursorColor: STColors.brightOrange,
                 decoration: InputDecoration(
                   hintText: 'What\'s the vibe',
-                  hintStyle: TextStyle(color: Colors.white70),
-                  prefixIcon: Icon(Icons.search, color: Colors.white70),
+                  hintStyle: const TextStyle(color: Colors.white70),
+                  prefixIcon: const Icon(Icons.search, color: Colors.white70),
                   filled: true,
                   fillColor: Colors.white10,
                   border: OutlineInputBorder(
@@ -60,7 +61,7 @@ class _SearchViewState extends State<SearchView> {
                   ),
                 ),
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
               Center(
                 child: ElevatedButton(
                   onPressed: searchFunction,
@@ -86,13 +87,12 @@ class _SearchViewState extends State<SearchView> {
                       return const Center(child: Text("No results found"));
                     }
 
-                    List<PlaylistData> playlists = snapshot.data!;
-                    print(playlists[0].name);
+                    List<spotify.Track> tracks = snapshot.data!;
                     return ListView.builder(
-                      itemCount: playlists.length,
+                      itemCount: tracks.length,
                       itemBuilder: (context, index) {
-                        var playlist = playlists[index];
-                        return SongListCard(playlistData: playlist, mq: mq);
+                        var track = tracks[index];
+                        return SongListCard(trackData: track, mq: mq);
                       },
                     );
                   },

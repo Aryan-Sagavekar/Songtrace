@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:songtrace/helpers/STColors.dart';
-import 'package:songtrace/model/playlist_model.dart';
+import 'package:songtrace/views/album_view.dart';
+import 'package:spotify/spotify.dart' as spotify;
 
 class SongListCard extends StatefulWidget {
-  final PlaylistData playlistData;
+  final spotify.Track trackData;
   final MediaQueryData mq;
 
-  const SongListCard({super.key, required this.playlistData, required this.mq});
+  const SongListCard({super.key, required this.trackData, required this.mq});
 
   @override
   State<SongListCard> createState() => _SongListCardState();
@@ -16,23 +17,31 @@ class SongListCard extends StatefulWidget {
 class _SongListCardState extends State<SongListCard> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: STColors.navyBlue,
-        border: const Border(),
-        borderRadius: const BorderRadius.all(Radius.circular(20)),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: Row(
-        children: [
-          Image(
-            image: NetworkImage(widget.playlistData.images[0]),
-            width: 70,
-            height: 70,
-          ),
-          Center(child: Text(widget.playlistData.name)),
-        ],
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => AlbumView(
+                  trackData: widget.trackData,
+                )));
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: STColors.navyBlue,
+          border: const Border(),
+          borderRadius: const BorderRadius.all(Radius.circular(20)),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        child: Row(
+          children: [
+            const Image(
+              image: AssetImage('assets/yoasobi.jpeg'),
+              width: 70,
+              height: 70,
+            ),
+            Center(child: Text(widget.trackData.name.toString())),
+          ],
+        ),
       ),
     );
   }

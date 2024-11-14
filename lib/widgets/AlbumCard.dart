@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import "package:songtrace/views/album_view.dart";
 // import "package:spotify_clone_songtrace/views/album_view.dart";
 
 class AlbumCard extends StatelessWidget {

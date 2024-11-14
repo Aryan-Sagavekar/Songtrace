@@ -10,10 +10,10 @@ class SpotifyService {
     spotify = SpotifyApi(credentials);
   }
 
-  static Future<List<PlaylistData>> searchTrackInfoByName(
-      String trackName) async {
+  static Future<List<Track>> searchTrackInfoByName(String trackName) async {
     var searchResult = await spotify!.search.get(trackName).first(5);
-    List<PlaylistData> foundTracks = [];
+    // List<PlaylistData> foundTracks = [];
+    List<Track> foundTracks = [];
 
     for (var pages in searchResult) {
       if (pages.items == null) {
@@ -21,37 +21,39 @@ class SpotifyService {
       }
 
       for (var item in pages.items!) {
-        if (item is PlaylistSimple) {
-          var playlist = PlaylistData(
-            id: item.id!,
-            name: item.name!,
-            collaborative: item.collaborative ?? false,
-            href: item.href!,
-            tracksLink: item.tracksLink!.href!,
-            snapshotId: item.snapshotId ?? '',
-            type: item.type ?? 'playlist',
-            uri: item.uri!,
-            images: item.images?.map((img) => img.url!).toList() ?? [],
-          );
+        // if (item is PlaylistSimple) {
+        //   var playlist = PlaylistData(
+        //     id: item.id!,
+        //     name: item.name!,
+        //     collaborative: item.collaborative ?? false,
+        //     href: item.href!,
+        //     tracksLink: item.tracksLink!.href!,
+        //     snapshotId: item.snapshotId ?? '',
+        //     type: item.type ?? 'playlist',
+        //     uri: item.uri!,
+        //     images: item.images?.map((img) => img.url!).toList() ?? [],
+        //   );
 
-          foundTracks.add(playlist);
+        //   foundTracks.add(playlist);
 
-          // print('Playlist Model:');
-          // print('ID: ${item.id}');
-          // print('Name: ${item.name}');
-          // print('Collaborative: ${item.collaborative}');
-          // print('Href: ${item.href}');
-          // print('Tracks Link: ${item.tracksLink}');
-          // print('Owner: ${item.owner!.displayName}');
-          // print('Public: ${item.public}');
-          // print('Snapshot ID: ${item.snapshotId}');
-          // print('Type: ${item.type}');
-          // print('URI: ${item.uri}');
-          // print('Images Count: ${item.images!.length}');
-          // print('-------------------------------');
-        }
+        // print('Playlist Model:');
+        // print('ID: ${item.id}');
+        // print('Name: ${item.name}');
+        // print('Collaborative: ${item.collaborative}');
+        // print('Href: ${item.href}');
+        // print('Tracks Link: ${item.tracksLink}');
+        // print('Owner: ${item.owner!.displayName}');
+        // print('Public: ${item.public}');
+        // print('Snapshot ID: ${item.snapshotId}');
+        // print('Type: ${item.type}');
+        // print('URI: ${item.uri}');
+        // print('Images Count: ${item.images!.length}');
+        // print('-------------------------------');
+        // }
 
         if (item is Track) {
+          foundTracks.add(item);
+
           // print('Track:\n'
           //     'id: ${item.id}\n'
           //     'name: ${item.name}\n'
@@ -74,26 +76,52 @@ class SpotifyService {
   }
 
   static Future<List<PlaylistData>> fetchFeaturedPlaylists() async {
-    var featuredPlaylists = await spotify!.playlists.featured.all();
+    var searchResult = await spotify!.search.get('Top 100').first(10);
     List<PlaylistData> featuredList = [];
 
-    for (var item in featuredPlaylists) {
-      print(item.name);
-      var playlist = PlaylistData(
-        id: item.id!,
-        name: item.name!,
-        collaborative: item.collaborative ?? false,
-        href: item.href!,
-        tracksLink: item.tracksLink!.href!,
-        snapshotId: item.snapshotId ?? '',
-        type: item.type ?? 'playlist',
-        uri: item.uri!,
-        images: item.images?.map((img) => img.url!).toList() ?? [],
-      );
+    for (var pages in searchResult) {
+      if (pages.items == null) {
+        print('Empty items');
+      }
 
-      featuredList.add(playlist);
+      for (var item in pages.items!) {
+        if (item is PlaylistSimple) {
+          var playlist = PlaylistData(
+            id: item.id!,
+            name: item.name!,
+            collaborative: item.collaborative ?? false,
+            href: item.href!,
+            tracksLink: item.tracksLink!.href!,
+            snapshotId: item.snapshotId ?? '',
+            type: item.type ?? 'playlist',
+            uri: item.uri!,
+            images: item.images?.map((img) => img.url!).toList() ?? [],
+          );
+
+          featuredList.add(playlist);
+        }
+      }
     }
-
     return featuredList;
+  }
+
+  static Future<List<Track>> fetchTopSongs() async {
+    var searchResult = await spotify!.search.get('linkin').first(10);
+    List<Track> topSongsList = [];
+
+    for (var pages in searchResult) {
+      if (pages.items == null) {
+        print('Empty items');
+      }
+
+      for (var item in pages.items!) {
+        if (item is Track) {
+          // print(item.name);
+
+          topSongsList.add(item);
+        }
+      }
+    }
+    return topSongsList;
   }
 }

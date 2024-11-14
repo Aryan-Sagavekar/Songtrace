@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:songtrace/helpers/spotify_api.dart';
 import 'package:songtrace/model/playlist_model.dart';
 import 'package:songtrace/widgets/AlbumCard.dart';
-import 'package:songtrace/widgets/SongCard.dart';
+import 'package:songtrace/widgets/SongCardPlaylist.dart';
+import 'package:songtrace/widgets/SongCardTrack.dart';
+import 'package:spotify/spotify.dart' as spotify;
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -12,12 +14,17 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  Future<List<PlaylistData>>? _youMightLikeSongs;
+  Future<List<PlaylistData>>? _top100Playlists;
+  Future<List<spotify.Track>>? _topSongs;
 
   @override
   void initState() {
     super.initState();
-    _youMightLikeSongs = SpotifyService.fetchFeaturedPlaylists();
+    SpotifyService.create();
+    _top100Playlists = SpotifyService.fetchFeaturedPlaylists();
+    _topSongs = SpotifyService.fetchTopSongs();
+
+    setState(() {});
   }
 
   @override
@@ -153,64 +160,47 @@ class _HomeViewState extends State<HomeView> {
                         Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Text(
-                            "What you might like",
+                            "Top 100 songs Playlists",
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
                         ),
-                        // const SingleChildScrollView(
-                        //   scrollDirection: Axis.horizontal,
-                        //   physics: BouncingScrollPhysics(),
-                        //   padding: EdgeInsets.symmetric(horizontal: 12),
-                        //   child: Row(
-                        //     children: [
-                        //       SongCard(
-                        //         image: AssetImage("assets/yoasobi.jpeg"),
-                        //         label: "Yoasobi, Tyler, Joseph and many more",
-                        //       ),
-                        //       SizedBox(width: 16),
-                        //       SongCard(
-                        //         image: AssetImage("assets/ghost.jpeg"),
-                        //         label: "INTERWORLD, Kyler, HIT and many more",
-                        //       ),
-                        //       SizedBox(width: 16),
-                        //       SongCard(
-                        //         image: AssetImage("assets/lata.jpg"),
-                        //         label:
-                        //             "Kishore Kumar, Lata Mangeshkar and many more",
-                        //       ),
-                        //       SizedBox(width: 16),
-                        //     ],
-                        //   ),
-                        // ),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: [
+                              SizedBox(
+                                height: mq.size.height * 0.25,
+                                width: mq.size.width,
+                                child: FutureBuilder(
+                                  future: _top100Playlists,
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return const Center(
+                                          child: CircularProgressIndicator());
+                                    } else if (snapshot.hasError) {
+                                      return Center(
+                                          child:
+                                              Text("Error: ${snapshot.error}"));
+                                    } else if (!snapshot.hasData ||
+                                        snapshot.data!.isEmpty) {
+                                      return const Center(
+                                          child: Text("No results found"));
+                                    }
 
-                        SizedBox(
-                          child: FutureBuilder(
-                            future: _youMightLikeSongs,
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return const Center(
-                                    child: CircularProgressIndicator());
-                              } else if (snapshot.hasError) {
-                                return Center(
-                                    child: Text("Error: ${snapshot.error}"));
-                              } else if (!snapshot.hasData ||
-                                  snapshot.data!.isEmpty) {
-                                return const Center(
-                                    child: Text("No results found"));
-                              }
-
-                              List<PlaylistData> playlists = snapshot.data!;
-                              return ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  itemBuilder: (context, index) {
-                                    var playlist = playlists[index];
-                                    return SongCard(
-                                        image:
-                                            AssetImage('assets/yoasobi.jpeg'),
-                                        label: playlist.name);
-                                  });
-                            },
+                                    List<PlaylistData> playlists =
+                                        snapshot.data!;
+                                    return ListView.builder(
+                                        scrollDirection: Axis.horizontal,
+                                        itemBuilder: (context, index) {
+                                          var playlist = playlists[index];
+                                          return SongCard(
+                                              playlistData: playlist);
+                                        });
+                                  },
+                                ),
+                              ),
+                            ],
                           ),
                         )
                       ],
@@ -221,35 +211,48 @@ class _HomeViewState extends State<HomeView> {
                         Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Text(
-                            "Recommended Radio",
+                            "Top Songs",
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
                         ),
-                        const SingleChildScrollView(
+                        SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
-                          physics: BouncingScrollPhysics(),
-                          padding: EdgeInsets.symmetric(horizontal: 12),
                           child: Row(
                             children: [
-                              SongCard(
-                                image: AssetImage("assets/yoasobi.jpeg"),
-                                label: "Yoasobi, Tyler, Joseph and many more",
+                              SizedBox(
+                                height: mq.size.height * 0.25,
+                                width: mq.size.width,
+                                child: FutureBuilder(
+                                  future: _topSongs,
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return const Center(
+                                          child: CircularProgressIndicator());
+                                    } else if (snapshot.hasError) {
+                                      return Center(
+                                          child:
+                                              Text("Error: ${snapshot.error}"));
+                                    } else if (!snapshot.hasData ||
+                                        snapshot.data!.isEmpty) {
+                                      return const Center(
+                                          child: Text("No results found"));
+                                    }
+
+                                    List<spotify.Track> tracks = snapshot.data!;
+                                    return ListView.builder(
+                                        scrollDirection: Axis.horizontal,
+                                        itemBuilder: (context, index) {
+                                          var track = tracks[index];
+                                          return SongCardTrack(
+                                              trackData: track);
+                                        });
+                                  },
+                                ),
                               ),
-                              SizedBox(width: 16),
-                              SongCard(
-                                image: AssetImage("assets/ghost.jpeg"),
-                                label: "INTERWORLD, Kyler, HIT and many more",
-                              ),
-                              SizedBox(width: 16),
-                              SongCard(
-                                image: AssetImage("assets/lata.jpg"),
-                                label:
-                                    "Kishore Kumar, Lata Mangeshkar and many more",
-                              ),
-                              SizedBox(width: 16),
                             ],
                           ),
-                        ),
+                        )
                       ],
                     )
                   ],

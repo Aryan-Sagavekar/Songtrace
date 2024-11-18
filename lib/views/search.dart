@@ -23,7 +23,7 @@ class _SearchViewState extends State<SearchView> {
     setState(() {
       _isLoading = true;
       _searchResults =
-          SpotifyService.searchTrackInfoByName(_textController.text);
+          SpotifyService.searchTrackInfoByName(_textController.text, 5);
     });
   }
 
@@ -82,7 +82,7 @@ class _SearchViewState extends State<SearchView> {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
                     } else if (snapshot.hasError) {
-                      return Center(child: Text("Error: ${snapshot.error}"));
+                      return Center(child: Text("Error: oops not found"));
                     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                       return const Center(child: Text("No results found"));
                     }

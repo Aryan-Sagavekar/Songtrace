@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:songtrace/helpers/spotify_api.dart';
 import 'package:songtrace/model/playlist_model.dart';
-import 'package:songtrace/views/album_view.dart';
+import 'package:songtrace/views/track_view.dart';
 import 'package:spotify/spotify.dart' as spotify;
 
 class SongCardTrack extends StatefulWidget {
@@ -19,7 +19,7 @@ class _SongCardTrackState extends State<SongCardTrack> {
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => AlbumView(
+            builder: (context) => TrackView(
                   trackData: widget.trackData,
                 )));
       },
@@ -29,7 +29,8 @@ class _SongCardTrackState extends State<SongCardTrack> {
         child: Column(
           children: [
             Image(
-              image: AssetImage('assets/yoasobi.jpeg'),
+              image: NetworkImage(
+                  widget.trackData.album!.images![0].url.toString()),
               height: 140,
               width: 140,
             ),

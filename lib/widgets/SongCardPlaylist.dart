@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:songtrace/model/playlist_model.dart';
+import 'package:songtrace/views/album_view.dart';
 // import 'package:spotify_clone_songtrace/views/album_view.dart';
 
 class SongCard extends StatefulWidget {
@@ -15,8 +16,12 @@ class _SongCardState extends State<SongCard> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => {
-        // Navigator.push(context,
-        //     MaterialPageRoute(builder: (context) => AlbumView(image: image)))
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => AlbumView(
+                      albumData: widget.playlistData,
+                    )))
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 20),

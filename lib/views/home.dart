@@ -87,16 +87,30 @@ class _HomeViewState extends State<HomeView> {
                       padding: EdgeInsets.all(20),
                       child: Row(
                         children: [
-                          AlbumCard(label: "Beast Mode", image: "anime.jpg"),
-                          SizedBox(width: 16),
-                          AlbumCard(label: "Peace", image: "kishore.jpeg"),
-                          SizedBox(width: 16),
-                          AlbumCard(label: "Melody of lata", image: "lata.jpg"),
-                          SizedBox(width: 16),
-                          AlbumCard(label: "Ophelia", image: "ophelia.jpeg"),
+                          AlbumCard(
+                              searchString: "demon slayer",
+                              label: "Beast Mode",
+                              image: "anime.jpg"),
                           SizedBox(width: 16),
                           AlbumCard(
-                              label: "Japnaese hits", image: "yoasobi.jpeg"),
+                              searchString: "Kishore",
+                              label: "Peace",
+                              image: "kishore.jpeg"),
+                          SizedBox(width: 16),
+                          AlbumCard(
+                              searchString: "lata mangeshkar",
+                              label: "Melody of lata",
+                              image: "lata.jpg"),
+                          SizedBox(width: 16),
+                          AlbumCard(
+                              searchString: "Ophelia",
+                              label: "Ophelia",
+                              image: "ophelia.jpeg"),
+                          SizedBox(width: 16),
+                          AlbumCard(
+                              searchString: "yoasobi",
+                              label: "Japnaese hits",
+                              image: "yoasobi.jpeg"),
                         ],
                       ),
                     ),
@@ -242,6 +256,7 @@ class _HomeViewState extends State<HomeView> {
                                     List<spotify.Track> tracks = snapshot.data!;
                                     return ListView.builder(
                                         scrollDirection: Axis.horizontal,
+                                        itemCount: tracks.length,
                                         itemBuilder: (context, index) {
                                           var track = tracks[index];
                                           return SongCardTrack(

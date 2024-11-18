@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:songtrace/views/home.dart';
+import 'package:songtrace/views/library_view.dart';
 import 'package:songtrace/views/profile.dart';
 import 'package:songtrace/views/search.dart';
 
@@ -45,7 +46,7 @@ class _TabbarState extends State<Tabbar> {
         children: [
           renderView(0, HomeView()),
           renderView(1, SearchView()),
-          // renderView(2, LibraryView()),
+          renderView(2, LibraryView()),
           renderView(3, ProfileView()),
         ],
       ),

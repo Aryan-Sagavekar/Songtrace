@@ -1,6 +1,7 @@
 import "package:flutter/material.dart";
 import "package:songtrace/helpers/STColors.dart";
 import "package:songtrace/navigation/tabbar.dart";
+import "package:songtrace/views/login_view.dart";
 
 void main() {
   runApp(const MyApp());
@@ -34,7 +35,7 @@ class _MyAppState extends State<MyApp> {
             selectedItemColor: STColors.brightOrange,
             unselectedItemColor: Colors.white38,
           )),
-      home: Tabbar(),
+      home: LoginPage(),
     );
   }
 }

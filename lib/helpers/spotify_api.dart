@@ -10,8 +10,9 @@ class SpotifyService {
     spotify = SpotifyApi(credentials);
   }
 
-  static Future<List<Track>> searchTrackInfoByName(String trackName) async {
-    var searchResult = await spotify!.search.get(trackName).first(5);
+  static Future<List<Track>> searchTrackInfoByName(
+      String trackName, int count) async {
+    var searchResult = await spotify!.search.get(trackName).first(count);
     // List<PlaylistData> foundTracks = [];
     List<Track> foundTracks = [];
 
@@ -31,8 +32,11 @@ class SpotifyService {
         //     snapshotId: item.snapshotId ?? '',
         //     type: item.type ?? 'playlist',
         //     uri: item.uri!,
+        //     description: item.description!,
+        //     trackCount: item.tracksLink!.total!,
         //     images: item.images?.map((img) => img.url!).toList() ?? [],
         //   );
+        // }
 
         //   foundTracks.add(playlist);
 
@@ -91,10 +95,11 @@ class SpotifyService {
             name: item.name!,
             collaborative: item.collaborative ?? false,
             href: item.href!,
-            tracksLink: item.tracksLink!.href!,
             snapshotId: item.snapshotId ?? '',
             type: item.type ?? 'playlist',
             uri: item.uri!,
+            description: item.description!,
+            tracksData: item.tracksLink!,
             images: item.images?.map((img) => img.url!).toList() ?? [],
           );
 
@@ -116,12 +121,33 @@ class SpotifyService {
 
       for (var item in pages.items!) {
         if (item is Track) {
-          // print(item.name);
+          // print(item.album!.images![0].url);
 
           topSongsList.add(item);
         }
       }
     }
     return topSongsList;
+  }
+
+  static Future<List<Track>> fetchTracksForAlbum(String albumName) async {
+    var searchResult =
+        await spotify!.search.get(albumName.substring(0, 2)).first(10);
+    List<Track> albumSongsList = [];
+
+    for (var pages in searchResult) {
+      if (pages.items == null) {
+        print('Empty items');
+      }
+
+      for (var item in pages.items!) {
+        if (item is Track) {
+          // print(item.album!.images![0].url);
+
+          albumSongsList.add(item);
+        }
+      }
+    }
+    return albumSongsList;
   }
 }

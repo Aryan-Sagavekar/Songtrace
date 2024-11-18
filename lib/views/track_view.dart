@@ -1,25 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:songtrace/helpers/spotify_api.dart';
-import 'package:songtrace/model/playlist_model.dart';
-import 'package:songtrace/widgets/SongListCard.dart';
 import 'package:spotify/spotify.dart' as spotify;
 
-class AlbumView extends StatefulWidget {
-  final PlaylistData albumData;
-  const AlbumView({super.key, required this.albumData});
+class TrackView extends StatefulWidget {
+  final spotify.Track trackData;
+  const TrackView({super.key, required this.trackData});
 
   @override
-  State<AlbumView> createState() => _AlbumViewState();
+  State<TrackView> createState() => _TrackViewState();
 }
 
-class _AlbumViewState extends State<AlbumView> {
+class _TrackViewState extends State<TrackView> {
   late ScrollController scrollController;
   double imageSize = 0;
   double initialSize = 240;
   final AudioPlayer _audioPlayer = AudioPlayer();
-  Future<List<spotify.Track>>? _tracksFromAlbum;
 
   @override
   void dispose() {
@@ -27,19 +22,19 @@ class _AlbumViewState extends State<AlbumView> {
     super.dispose();
   }
 
-  // void _playAlbumTracksPreview() async {
-  //   final previewUrl = widget.albumData.previewUrl;
-  //   print("clicked play");
+  void _playSongPreview() async {
+    final previewUrl = widget.trackData.previewUrl;
+    print("clicked play");
 
-  //   if (previewUrl != null) {
-  //     await _audioPlayer.setUrl(previewUrl);
-  //     _audioPlayer.play();
-  //   } else {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       const SnackBar(content: Text('No preview available for this track')),
-  //     );
-  //   }
-  // }
+    if (previewUrl != null) {
+      await _audioPlayer.setUrl(previewUrl);
+      _audioPlayer.play();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No preview available for this track')),
+      );
+    }
+  }
 
   @override
   void initState() {
@@ -52,15 +47,10 @@ class _AlbumViewState extends State<AlbumView> {
         }
       });
     super.initState();
-
-    _tracksFromAlbum = SpotifyService.fetchTracksForAlbum(widget.albumData.id);
-    // print(widget.albumData.tracksData.href);
   }
 
   @override
   Widget build(BuildContext context) {
-    var mq = MediaQuery.of(context);
-
     return Scaffold(
       body: Stack(
         children: [
@@ -100,7 +90,9 @@ class _AlbumViewState extends State<AlbumView> {
                             )
                           ]),
                           child: Image(
-                            image: NetworkImage(widget.albumData.images[0]),
+                            image: NetworkImage(widget
+                                .trackData.album!.images![0].url
+                                .toString()),
                             width: imageSize,
                             height: imageSize,
                             fit: BoxFit.cover,
@@ -113,7 +105,9 @@ class _AlbumViewState extends State<AlbumView> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "Album picked up for your own good",
+                                widget.trackData.artists!
+                                    .map((artist) => artist.name)
+                                    .join(', '),
                                 style: Theme.of(context).textTheme.bodySmall,
                               ),
                               const SizedBox(height: 16),
@@ -133,7 +127,7 @@ class _AlbumViewState extends State<AlbumView> {
                               ),
                               const SizedBox(height: 16),
                               Text(
-                                "${widget.albumData.description} Songs ${widget.albumData.description}",
+                                "${widget.trackData.popularity}M likes ${widget.trackData.duration}",
                                 style: Theme.of(context).textTheme.bodySmall,
                               ),
                               const SizedBox(height: 16),
@@ -166,7 +160,7 @@ class _AlbumViewState extends State<AlbumView> {
                                               Icons.play_arrow,
                                               size: 38,
                                             ),
-                                            onPressed: () {},
+                                            onPressed: _playSongPreview,
                                           ),
                                         ),
                                         Container(
@@ -196,32 +190,6 @@ class _AlbumViewState extends State<AlbumView> {
                   Container(
                     color: Colors.black,
                     height: 500,
-                    width: mq.size.width,
-                    child: FutureBuilder(
-                      future: _tracksFromAlbum,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Center(
-                              child: CircularProgressIndicator());
-                        } else if (snapshot.hasError) {
-                          return Center(
-                              child: Text("Error: ${snapshot.error}"));
-                        } else if (!snapshot.hasData ||
-                            snapshot.data!.isEmpty) {
-                          return const Center(child: Text("No results found"));
-                        }
-
-                        List<spotify.Track> tracks = snapshot.data!;
-                        return ListView.builder(
-                          itemCount: tracks.length,
-                          itemBuilder: (context, index) {
-                            var track = tracks[index];
-                            return SongListCard(trackData: track, mq: mq);
-                          },
-                        );
-                      },
-                    ),
                   )
                 ],
               ),

@@ -6,20 +6,21 @@ import 'package:songtrace/model/playlist_model.dart';
 import 'package:songtrace/widgets/SongListCard.dart';
 import 'package:spotify/spotify.dart' as spotify;
 
-class AlbumView extends StatefulWidget {
-  final PlaylistData albumData;
-  const AlbumView({super.key, required this.albumData});
+class RPAlbumView extends StatefulWidget {
+  final String image;
+  final String albumName;
+  const RPAlbumView({super.key, required this.image, required this.albumName});
 
   @override
-  State<AlbumView> createState() => _AlbumViewState();
+  State<RPAlbumView> createState() => _RPAlbumViewState();
 }
 
-class _AlbumViewState extends State<AlbumView> {
+class _RPAlbumViewState extends State<RPAlbumView> {
   late ScrollController scrollController;
   double imageSize = 0;
   double initialSize = 240;
   final AudioPlayer _audioPlayer = AudioPlayer();
-  Future<List<spotify.Track>>? _tracksFromAlbum;
+  Future<List<spotify.Track>>? _tracksFromSpecificAlbum;
 
   @override
   void dispose() {
@@ -53,7 +54,8 @@ class _AlbumViewState extends State<AlbumView> {
       });
     super.initState();
 
-    _tracksFromAlbum = SpotifyService.fetchTracksForAlbum(widget.albumData.id);
+    _tracksFromSpecificAlbum =
+        SpotifyService.searchTrackInfoByName(widget.albumName, 10);
     // print(widget.albumData.tracksData.href);
   }
 
@@ -100,7 +102,7 @@ class _AlbumViewState extends State<AlbumView> {
                             )
                           ]),
                           child: Image(
-                            image: NetworkImage(widget.albumData.images[0]),
+                            image: AssetImage('assets/${widget.image}'),
                             width: imageSize,
                             height: imageSize,
                             fit: BoxFit.cover,
@@ -133,7 +135,7 @@ class _AlbumViewState extends State<AlbumView> {
                               ),
                               const SizedBox(height: 16),
                               Text(
-                                "${widget.albumData.description} Songs ${widget.albumData.description}",
+                                "10 Songs, Picked for you",
                                 style: Theme.of(context).textTheme.bodySmall,
                               ),
                               const SizedBox(height: 16),
@@ -198,7 +200,7 @@ class _AlbumViewState extends State<AlbumView> {
                     height: 500,
                     width: mq.size.width,
                     child: FutureBuilder(
-                      future: _tracksFromAlbum,
+                      future: _tracksFromSpecificAlbum,
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
